@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ferretería Bujaida - Sistema Integral</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* DISEÑO DE LAS PESTAÑAS (MENÚ) */
+        .tabs-menu {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #34495e;
+            padding-bottom: 5px;
+        }
+
+        .tab-btn {
+            background: #bdc3c7;
+            color: #2c3e50;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover {
+            background: #95a5a6;
+        }
+
+        .tab-btn.active {
+            background: #34495e;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* ESTRUCTURA PRINCIPAL */
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 20px;
+        }
+
+        .full-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 900px) {
+            .grid-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #34495e;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 5px;
+            font-size: 18px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 10px;
+            align-items: end;
+        }
+
+        .conversion-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .input-conv {
+            background-color: #fafbfc;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        .input-conv:focus {
+            background-color: #fff;
+            border-color: #3498db;
+            outline: none;
+        }
+
+        button {
+            background: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #2980b9;
+        }
+
+        button.success {
+            background: #27ae60;
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            margin-top: 15px;
+        }
+
+        button.success:hover {
+            background: #219653;
+        }
+
+        button.edit {
+            background: #f39c12;
+            padding: 8px 12px;
+            margin-right: 5px;
+        }
+
+        button.edit:hover {
+            background: #d35400;
+        }
+
+        button.danger {
+            background: #e74c3c;
+            padding: 8px 12px;
+        }
+
+        button.danger:hover {
+            background: #c0392b;
+        }
+
+        button.clear {
+            background: #7f8c8d;
+            margin-top: 10px;
+        }
+
+        button.clear:hover {
+            background: #6c7a7d;
+        }
+
+        button.print {
+            background: #f39c12;
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            margin-top: 15px;
+        }
+
+        button.print:hover {
+            background: #d35400;
+        }
+
+        button.email-btn {
+            background: #27ae60;
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        button.email-btn:hover {
+            background: #1e7e43;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            padding: 12px 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+        }
+
+        th {
+            background: #34495e;
+            color: white;
+        }
+
+        .totales {
+            margin-top: 20px;
+            text-align: right;
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        /* DISEÑO EXCLUSIVO DEL TICKET */
+        .ticket-container {
+            position: sticky;
+            top: 20px;
+        }
+
+        .ticket {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border: 1px solid #ddd;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #000;
+        }
+
+        .ticket h2.ticket-title {
+            text-align: center;
+            margin: 5px 0 2px 0;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            padding: 0;
+            color: #000;
+        }
+
+        .ticket h3 {
+            text-align: center;
+            margin: 8px 0 5px 0;
+            font-size: 14px;
+        }
+
+        .ticket p {
+            margin: 3px 0;
+        }
+
+        .ticket hr {
+            margin: 10px 0;
+            border: 0;
+            border-top: 1px dashed #000;
+        }
+
+        .ticket-product-block {
+            margin-bottom: 8px;
+        }
+
+        .ticket-item-main {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+        }
+
+        .ticket-item-sub {
+            text-align: right;
+            font-size: 11px;
+            color: #333;
+        }
+
+        .ticket-total {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            font-size: 15px;
+            margin-top: 10px;
+        }
+
+        .ticket-contact-info {
+            text-align: center;
+            font-size: 11px;
+            color: #333;
+            line-height: 1.3;
+        }
+
+        /* BUSCADOR DE PRODUCTOS (AUTOCOMPLETE) */
+        .producto-search-wrapper {
+            position: relative;
+        }
+
+        .producto-search-wrapper .search-status {
+            font-size: 11px;
+            color: #7f8c8d;
+            margin-top: 3px;
+        }
+
+        .autocomplete-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #3498db;
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            max-height: 220px;
+            overflow-y: auto;
+            z-index: 999;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .autocomplete-item {
+            padding: 9px 12px;
+            cursor: pointer;
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.15s;
+        }
+
+        .autocomplete-item:last-child { border-bottom: none; }
+
+        .autocomplete-item:hover,
+        .autocomplete-item.selected {
+            background: #eaf4fb;
+        }
+
+        .autocomplete-item .item-nombre {
+            font-weight: 600;
+            color: #2c3e50;
+            flex: 1;
+        }
+
+        .autocomplete-item .item-desc {
+            font-size: 11px;
+            color: #7f8c8d;
+            margin-left: 8px;
+        }
+
+        .autocomplete-item .item-precio {
+            font-weight: bold;
+            color: #27ae60;
+            margin-left: 10px;
+            white-space: nowrap;
+        }
+
+        .sheet-status-bar {
+            background: #eaf4fb;
+            border: 1px solid #aed6f1;
+            border-radius: 6px;
+            padding: 8px 14px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #2980b9;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sheet-status-bar.error { background: #fdedec; border-color: #f1948a; color: #c0392b; }
+        .sheet-status-bar.ok { background: #eafaf1; border-color: #a9dfbf; color: #1e8449; }
+
+        /* CONFIGURACIÓN DE IMPRESIÓN */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #ticketImprimible, #ticketImprimible * {
+                visibility: visible;
+            }
+            #ticketImprimible {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                border: none;
+                box-shadow: none;
+                padding: 0;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏪 Ferretería Bujaida - Panel Operativo</h1>
+
+        <!-- MENÚ DE PESTAÑAS -->
+        <div class="tabs-menu">
+            <button id="btn-tab-factura" class="tab-btn active" onclick="cambiarPestana('factura')">🛒 Factura Directa</button>
+            <button id="btn-tab-cotizacion" class="tab-btn" onclick="cambiarPestana('cotizacion')">📄 Cotizaciones</button>
+            <button id="btn-tab-conversiones" class="tab-btn" onclick="cambiarPestana('conversiones')">📐 Conversiones</button>
+        </div>
+
+        <div id="main-layout" class="grid-layout">
+            <!-- COLUMNA IZQUIERDA: CONTENIDOS DINÁMICOS -->
+            <div id="left-column">
+                <!-- PESTAÑA 1: FACTURACIÓN -->
+                <div id="modulo-factura" class="tab-content active">
+                    <div class="panel">
+                        <h2>Datos de la Factura</h2>
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label>Nombre del Cliente <span style="color: red;">*</span>:</label>
+                            <input type="text" id="clienteFactura" placeholder="Nombre para la factura (Obligatorio)">
+                        </div>
+
+                        <h2>Agregar Producto a Factura</h2>
+                        <div id="sheetStatusFactura" class="sheet-status-bar">⏳ Cargando catálogo de productos...</div>
+                <div id="debugPanel" style="display:none; background:#1e1e1e; color:#0f0; font-family:monospace; font-size:11px; padding:10px; border-radius:5px; margin-bottom:10px; white-space:pre-wrap; max-height:200px; overflow:auto;"></div>
+                <button type="button" onclick="mostrarDebug()" style="background:#7f8c8d; color:white; padding:4px 10px; font-size:11px; margin-bottom:8px; border-radius:4px; border:none; cursor:pointer;">🔍 Ver datos del CSV (debug)</button>
+                        <form id="formFactura" onsubmit="agregarItem(event, 'factura')">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Buscar Producto:</label>
+                                    <div class="producto-search-wrapper" id="wrapperFactura">
+                                        <input type="text" id="nombreFactura" placeholder="🔍 Escribe para buscar..." autocomplete="off"
+                                            oninput="filtrarProductos('factura')"
+                                            onkeydown="navegarLista(event, 'factura')"
+                                            onfocus="filtrarProductos('factura')"
+                                            required>
+                                        <div id="listaFactura" class="autocomplete-list" style="display:none;"></div>
+                                        <div class="search-status" id="statusFactura"></div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Precio ($):</label>
+                                    <input type="number" id="precioFactura" step="0.01" min="0.01" placeholder="0.00" onkeypress="return event.charCode >= 48 || event.charCode == 46" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Cantidad:</label>
+                                    <input type="number" id="cantFactura" min="1" step="1" value="1" onkeypress="return event.charCode >= 48 && event.charCode <= 57" required>
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit">Añadir ➕</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="panel">
+                        <h2>Detalle de la Factura Actual</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Cant.</th>
+                                    <th>Descripción</th>
+                                    <th>Precio Unit.</th>
+                                    <th>Subtotal</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaFactura">
+                                <tr>
+                                    <td colspan="5" style="text-align: center; color: #999; padding: 20px;">Ningún producto agregado todavía</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="totales">Total Factura: $<span id="totalFactura">0.00</span></div>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="success" onclick="generarTicket('factura')">📋 Generar Ticket Factura</button>
+                            <button class="clear" onclick="limpiarModulo('factura')">🗑️ Vaciar Factura</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PESTAÑA 2: COTIZACIONES -->
+                <div id="modulo-cotizacion" class="tab-content">
+                    <div class="panel">
+                        <h2>Datos de la Cotización</h2>
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label>Nombre del Cliente Solicitante <span style="color: red;">*</span>:</label>
+                            <input type="text" id="clienteCotizacion" placeholder="Nombre para la cotización (Obligatorio)">
+                        </div>
+
+                        <h2>Agregar Producto a Cotización</h2>
+                        <div id="sheetStatusCotizacion" class="sheet-status-bar">⏳ Cargando catálogo de productos...</div>
+                        <form id="formCotizacion" onsubmit="agregarItem(event, 'cotizacion')">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Buscar Producto:</label>
+                                    <div class="producto-search-wrapper" id="wrapperCotizacion">
+                                        <input type="text" id="nombreCotizacion" placeholder="🔍 Escribe para buscar..." autocomplete="off"
+                                            oninput="filtrarProductos('cotizacion')"
+                                            onkeydown="navegarLista(event, 'cotizacion')"
+                                            onfocus="filtrarProductos('cotizacion')"
+                                            required>
+                                        <div id="listaCotizacion" class="autocomplete-list" style="display:none;"></div>
+                                        <div class="search-status" id="statusCotizacion"></div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Precio ($):</label>
+                                    <input type="number" id="precioCotizacion" step="0.01" min="0.01" placeholder="0.00" onkeypress="return event.charCode >= 48 || event.charCode == 46" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Cantidad:</label>
+                                    <input type="number" id="cantCotizacion" min="1" step="1" value="1" onkeypress="return event.charCode >= 48 && event.charCode <= 57" required>
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit" style="background: #9b59b6;">Añadir ➕</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="panel">
+                        <h2>Detalle de la Cotización Actual</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Cant.</th>
+                                    <th>Descripción</th>
+                                    <th>Precio Unit.</th>
+                                    <th>Subtotal</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaCotizacion">
+                                <tr>
+                                    <td colspan="5" style="text-align: center; color: #999; padding: 20px;">Ninguna cotización armada todavía</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="totales">Total Cotización: $<span id="totalCotizacion">0.00</span></div>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="success" style="background: #9b59b6;" onclick="generarTicket('cotizacion')">📋 Generar Ticket Cotización</button>
+                            <button class="clear" onclick="limpiarModulo('cotizacion')">🗑️ Vaciar Cotización</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PESTAÑA 3: CONVERSIONES -->
+                <div id="modulo-conversiones" class="tab-content">
+                    <!-- SECCIÓN LONGITUD -->
+                    <div class="panel">
+                        <h2 style="color: #2980b9;">📏 Convertidor de Longitud</h2>
+                        <div class="conversion-grid">
+                            <div class="form-group">
+                                <label>Metros (m):</label>
+                                <input type="number" step="any" id="conv_m" class="input-conv" placeholder="0" oninput="convertirLongitud('m', this.value)">
+                            </div>
+                            <div class="form-group">
+                                <label>Yardas (yd):</label>
+                                <input type="number" step="any" id="conv_yd" class="input-conv" placeholder="0" oninput="convertirLongitud('yd', this.value)">
+                            </div>
+                            <div class="form-group">
+                                <label>Varas (vrs):</label>
+                                <input type="number" step="any" id="conv_vrs" class="input-conv" placeholder="0" oninput="convertirLongitud('vrs', this.value)">
+                            </div>
+                            <div class="form-group">
+                                <label>Pies (ft):</label>
+                                <input type="number" step="any" id="conv_ft" class="input-conv" placeholder="0" oninput="convertirLongitud('ft', this.value)">
+                            </div>
+                            <div class="form-group">
+                                <label>Centímetros (cm):</label>
+                                <input type="number" step="any" id="conv_cm" class="input-conv" placeholder="0" oninput="convertirLongitud('cm', this.value)">
+                            </div>
+                            <div class="form-group">
+                                <label>Pulgadas (in):</label>
+                                <input type="number" step="any" id="conv_in" class="input-conv" placeholder="0" oninput="convertirLongitud('in', this.value)">
+                            </div>
+                            <div class="form-group">
+                                <label>Milímetros (mm):</label>
+                                <input type="number" step="any" id="conv_mm" class="input-conv" placeholder="0" oninput="convertirLongitud('mm', this.value)">
+                            </div>
+                        </div>
+                        <button class="clear" style="margin-top: 5px; padding: 6px 12px; font-size:12px;" onclick="limpiarCamposClase('longitud')">Limpiar Longitudes 🔄</button>
+                    </div>
+
+                    <!-- SECCIÓN MASA -->
+                    <div class="panel">
+                        <h2 style="color: #27ae60;">⚖️ Convertidor de Masa (Peso)</h2>
+                        <div class="conversion-grid">
+                            <div class="form-group">
+                                <label>Kilogramos (kg):</label>
+                                <input type="number" step="any" id="conv_kg" class="input-conv" placeholder="0" oninput="convertirMasa('kg', this.value)">
+                            </div>
+                            <div class="form-group">
+                                <label>Libras (lb):</label>
+                                <input type="number" step="any" id="conv_lb" class="input-conv" placeholder="0" oninput="convertirMasa('lb', this.value)">
+                            </div>
+                            <div class="form-group">
+                                <label>Arrobas (@):</label>
+                                <input type="number" step="any" id="conv_ar" class="input-conv" placeholder="0" oninput="convertirMasa('ar', this.value)">
+                            </div>
+                            <div class="form-group">
+                                <label>Quintales (qq):</label>
+                                <input type="number" step="any" id="conv_qq" class="input-conv" placeholder="0" oninput="convertirMasa('qq', this.value)">
+                            </div>
+                            <div class="form-group">
+                                <label>Toneladas (t):</label>
+                                <input type="number" step="any" id="conv_t" class="input-conv" placeholder="0" oninput="convertirMasa('t', this.value)">
+                            </div>
+                        </div>
+                        <button class="clear" style="margin-top: 5px; padding: 6px 12px; font-size:12px;" onclick="limpiarCamposClase('masa')">Limpiar Masa 🔄</button>
+                    </div>
+
+                    <!-- SECCIÓN VOLUMEN -->
+                    <div class="panel">
+                        <h2 style="color: #e67e22;">🧪 Convertidor de Volumen (Líquidos)</h2>
+                        <div class="conversion-grid">
+                            <div class="form-group">
+                                <label>Litros (L):</label>
+                                <input type="number" step="any" id="conv_l" class="input-conv" placeholder="0" oninput="convertirVolumen('l', this.value)">
+                            </div>
+                            <div class="form-group">
+                                <label>Galones (gal):</label>
+                                <input type="number" step="any" id="conv_gal" class="input-conv" placeholder="0" oninput="convertirVolumen('gal', this.value)">
+                            </div>
+                            <div class="form-group">
+                                <label>Barriles (bbl):</label>
+                                <input type="number" step="any" id="conv_bbl" class="input-conv" placeholder="0" oninput="convertirVolumen('bbl', this.value)">
+                            </div>
+                        </div>
+                        <button class="clear" style="margin-top: 5px; padding: 6px 12px; font-size:12px;" onclick="limpiarCamposClase('volumen')">Limpiar Volumen 🔄</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLUMNA DERECHA: VISTA PREVIA GLOBAL DEL TICKET Y OPCIONES DE ENVÍO -->
+            <div id="right-column-ticket" class="ticket-container">
+                <div class="panel" style="padding: 10px; background: #eaeded;">
+                    <h2 style="margin-bottom: 10px; border: none; text-align: center;">Vista Previa</h2>
+                    
+                    <div id="ticketImprimible" class="ticket">
+                        <div style="text-align: center; color: #7f8c8d; padding: 40px 0;">
+                            Presiona "Generar Ticket" en el módulo activo para visualizar el comprobante.
+                        </div>
+                    </div>
+
+                    <button class="print" onclick="imprimirTicket()">🖨️ Imprimir Ticket</button>
+
+                    <!-- PANEL EXCLUSIVO PARA ENVÍO POR CORREO ELECTRÓNICO DIRECTO -->
+                    <div id="panelEnvioCorreo" style="display: none; margin-top: 15px; padding-top: 15px; border-top: 2px dashed #bdc3c7;">
+                        <div class="form-group">
+                            <label style="color: #27ae60;">✉️ Correo Destinatario (Cliente):</label>
+                            <input type="email" id="emailCliente" placeholder="cliente@correo.com">
+                        </div>
+                        <button class="email-btn" onclick="enviarTicketFormateadoPorCorreo()">🚀 Enviar Ticket por Correo</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        //  CATÁLOGO DE PRODUCTOS DESDE GOOGLE SHEETS
+        // ============================================================
+        const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTD5KxcrfIGX9tOEXQT7T16yxzWUQs737GEzZqnNyVgeISc6oI8WMqKduvuGq94KkjdzgqCN6u2Lcer/pub?gid=0&single=true&output=csv";
+
+        let catalogoProductos = [];   // [{ nombre, descripcion, precio }]
+        let indiceSeleccionado = { factura: -1, cotizacion: -1 };
+
+        // Decodifica base64 a texto si el contenido viene en ese formato
+        function decodificarContenido(texto) {
+            if (!texto) return "";
+            // allorigins a veces devuelve: data:text/csv;base64,XXXX
+            if (texto.startsWith("data:") && texto.includes("base64,")) {
+                const b64 = texto.split("base64,")[1];
+                try { return atob(b64); } catch(e) { return texto; }
+            }
+            return texto;
+        }
+
+        async function fetchConTimeout(url, opciones, timeoutMs) {
+            const ctrl = new AbortController();
+            const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+            try {
+                const r = await fetch(url, { ...opciones, signal: ctrl.signal });
+                clearTimeout(timer);
+                return r;
+            } catch(e) {
+                clearTimeout(timer);
+                throw e;
+            }
+        }
+
+        async function fetchCSV() {
+            const enc = encodeURIComponent(SHEET_CSV_URL);
+
+            // Intento 1: directo (funciona si el servidor permite CORS)
+            try {
+                const r = await fetchConTimeout(SHEET_CSV_URL, {}, 5000);
+                if (r.ok) { const t = await r.text(); if (t.includes(",")) return t; }
+            } catch(e) {}
+
+            // Intento 2: corsproxy.io
+            try {
+                const r = await fetchConTimeout("https://corsproxy.io/?" + enc, {}, 7000);
+                if (r.ok) { const t = await r.text(); if (t.includes(",")) return t; }
+            } catch(e) {}
+
+            // Intento 3: allorigins — puede devolver base64
+            try {
+                const r = await fetchConTimeout("https://api.allorigins.win/get?url=" + enc, {}, 7000);
+                if (r.ok) {
+                    const j = await r.json();
+                    const texto = decodificarContenido(j.contents || "");
+                    if (texto.includes(",")) return texto;
+                }
+            } catch(e) {}
+
+            // Intento 4: thingproxy
+            try {
+                const r = await fetchConTimeout("https://thingproxy.freeboard.io/fetch/" + SHEET_CSV_URL, {}, 7000);
+                if (r.ok) { const t = await r.text(); if (t.includes(",")) return t; }
+            } catch(e) {}
+
+            // Intento 5: proxy de htmldriven
+            try {
+                const r = await fetchConTimeout("https://cors.eu.org/" + SHEET_CSV_URL, {}, 7000);
+                if (r.ok) { const t = await r.text(); if (t.includes(",")) return t; }
+            } catch(e) {}
+
+            // Intento 6: crossorigin.me
+            try {
+                const r = await fetchConTimeout("https://crossorigin.me/" + SHEET_CSV_URL, {}, 7000);
+                if (r.ok) { const t = await r.text(); if (t.includes(",")) return t; }
+            } catch(e) {}
+
+            throw new Error("No se pudo conectar con ningún proxy");
+        }
+
+        async function cargarCatalogo() {
+            try {
+                const texto = await fetchCSV();
+                // Normalizar saltos de línea Windows \r\n y separar
+                const lineas = texto.trim().replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n");
+
+                // Ignorar la fila de cabecera (fila 1)
+                catalogoProductos = [];
+                for (let i = 1; i < lineas.length; i++) {
+                    const lineaLimpia = lineas[i].trim();
+                    if (!lineaLimpia) continue;
+                    const cols = parsearCSVLinea(lineaLimpia);
+                    if (cols.length < 1 || !cols[0].trim()) continue;
+
+                    const nombre      = (cols[0] || "").trim();
+                    const descripcion = (cols[1] || "").trim();
+                    const precioStr   = (cols[2] || "0").trim().replace(",", ".");
+                    const precio      = parseFloat(precioStr);
+
+                    if (nombre && nombre.toLowerCase() !== "producto") {
+                        catalogoProductos.push({ nombre, descripcion, precio: isNaN(precio) ? 0 : precio });
+                    }
+                }
+
+                const msg = catalogoProductos.length > 0
+                    ? `✅ Catálogo cargado: ${catalogoProductos.length} productos`
+                    : `⚠️ CSV recibido (${lineas.length} líneas) pero 0 productos. L0: "${lineas[0]}" | L1: "${lineas[1]}" | L2: "${lineas[2]}"`;
+                const tipo = catalogoProductos.length > 0 ? "ok" : "error";
+                setSheetStatus("factura",    msg, tipo);
+                setSheetStatus("cotizacion", msg, tipo);
+
+            } catch (err) {
+                const msg = `⚠️ No se pudo cargar el catálogo automáticamente. Puedes escribir el producto manualmente o <a href="#" onclick="reintentarCatalogo()" style="color:#c0392b; font-weight:bold;">reintentar aquí</a>. (${err.message})`;
+                setSheetStatusHTML("factura",    msg, "error");
+                setSheetStatusHTML("cotizacion", msg, "error");
+                console.warn("Error cargando catálogo:", err);
+            }
+        }
+
+        function reintentarCatalogo() {
+            setSheetStatus("factura",    "⏳ Reintentando conexión...", "");
+            setSheetStatus("cotizacion", "⏳ Reintentando conexión...", "");
+            cargarCatalogo();
+        }
+
+        function setSheetStatusHTML(modulo, html, tipo) {
+            const el = document.getElementById(`sheetStatus${modulo.charAt(0).toUpperCase() + modulo.slice(1)}`);
+            if (!el) return;
+            el.innerHTML = html;
+            el.className = "sheet-status-bar " + (tipo || "");
+        }
+
+        // Parsear una línea CSV respetando campos entre comillas
+        function parsearCSVLinea(linea) {
+            const resultado = [];
+            let campo = "", dentroComillas = false;
+            for (let i = 0; i < linea.length; i++) {
+                const c = linea[i];
+                if (c === '"') { dentroComillas = !dentroComillas; }
+                else if (c === ',' && !dentroComillas) { resultado.push(campo); campo = ""; }
+                else { campo += c; }
+            }
+            resultado.push(campo);
+            return resultado;
+        }
+
+        function setSheetStatus(modulo, msg, tipo) {
+            const el = document.getElementById(`sheetStatus${modulo.charAt(0).toUpperCase() + modulo.slice(1)}`);
+            if (!el) return;
+            el.textContent = msg;
+            el.className = "sheet-status-bar " + (tipo || "");
+        }
+
+        // ── Filtrar productos al escribir ──────────────────────────
+        function filtrarProductos(modulo) {
+            const input = document.getElementById(`nombre${modulo.charAt(0).toUpperCase() + modulo.slice(1)}`);
+            const lista = document.getElementById(`lista${modulo.charAt(0).toUpperCase() + modulo.slice(1)}`);
+            const status = document.getElementById(`status${modulo.charAt(0).toUpperCase() + modulo.slice(1)}`);
+            const query = input.value.trim().toLowerCase();
+
+            indiceSeleccionado[modulo] = -1;
+
+            if (!query || catalogoProductos.length === 0) {
+                lista.style.display = "none";
+                status.textContent = catalogoProductos.length === 0 ? "Sin catálogo cargado – escribe el producto manualmente" : "";
+                return;
+            }
+
+            const filtrados = catalogoProductos.filter(p =>
+                p.nombre.toLowerCase().includes(query) ||
+                p.descripcion.toLowerCase().includes(query)
+            ).slice(0, 30);
+
+            if (filtrados.length === 0) {
+                lista.innerHTML = `<div class="autocomplete-item" style="color:#999; cursor:default;">Sin resultados — el producto se agregará tal como lo escribiste</div>`;
+                lista.style.display = "block";
+                status.textContent = "";
+                return;
+            }
+
+            lista.innerHTML = filtrados.map((p, i) => `
+                <div class="autocomplete-item" data-index="${i}" data-nombre="${escHtml(p.nombre)}" data-precio="${p.precio}"
+                     onmousedown="seleccionarProducto(event, '${modulo}', '${escHtml(p.nombre)}', '${escHtml(p.descripcion)}', ${p.precio})">
+                    <span class="item-nombre">${resaltarTexto(p.nombre, query)}</span>
+                    ${p.descripcion ? `<span class="item-desc">${resaltarTexto(p.descripcion, query)}</span>` : ""}
+                    <span class="item-precio">$${p.precio.toFixed(2)}</span>
+                </div>`).join("");
+
+            lista.style.display = "block";
+            status.textContent = `${filtrados.length} resultado(s)`;
+        }
+
+        function seleccionarProducto(e, modulo, nombre, descripcion, precio) {
+            if (e) e.preventDefault();
+            const cap = modulo.charAt(0).toUpperCase() + modulo.slice(1);
+            document.getElementById(`nombre${cap}`).value = descripcion || nombre;
+            document.getElementById(`precio${cap}`).value = precio > 0 ? precio.toFixed(2) : "";
+            document.getElementById(`lista${cap}`).style.display = "none";
+            document.getElementById(`status${cap}`).textContent = `✔ ${nombre}${precio > 0 ? " · $" + precio.toFixed(2) : ""}`;
+            document.getElementById(`cant${cap}`).focus();
+        }
+
+        // ── Navegación con teclado (↑ ↓ Enter Esc) ────────────────
+        function navegarLista(event, modulo) {
+            const cap = modulo.charAt(0).toUpperCase() + modulo.slice(1);
+            const lista = document.getElementById(`lista${cap}`);
+            const items = lista.querySelectorAll(".autocomplete-item[data-index]");
+            if (lista.style.display === "none" || items.length === 0) return;
+
+            if (event.key === "ArrowDown") {
+                event.preventDefault();
+                indiceSeleccionado[modulo] = Math.min(indiceSeleccionado[modulo] + 1, items.length - 1);
+            } else if (event.key === "ArrowUp") {
+                event.preventDefault();
+                indiceSeleccionado[modulo] = Math.max(indiceSeleccionado[modulo] - 1, 0);
+            } else if (event.key === "Enter" && indiceSeleccionado[modulo] >= 0) {
+                event.preventDefault();
+                const item = items[indiceSeleccionado[modulo]];
+                seleccionarProducto(null, modulo, item.dataset.nombre, item.dataset.nombre, parseFloat(item.dataset.precio));
+                return;
+            } else if (event.key === "Escape") {
+                lista.style.display = "none";
+                return;
+            } else { return; }
+
+            items.forEach((el, i) => el.classList.toggle("selected", i === indiceSeleccionado[modulo]));
+            if (indiceSeleccionado[modulo] >= 0) items[indiceSeleccionado[modulo]].scrollIntoView({ block: "nearest" });
+        }
+
+        // Cerrar lista al hacer click fuera
+        document.addEventListener("click", function(e) {
+            ["factura","cotizacion"].forEach(modulo => {
+                const cap = modulo.charAt(0).toUpperCase() + modulo.slice(1);
+                const wrapper = document.getElementById(`wrapper${cap}`);
+                if (wrapper && !wrapper.contains(e.target)) {
+                    const lista = document.getElementById(`lista${cap}`);
+                    if (lista) lista.style.display = "none";
+                }
+            });
+        });
+
+        // Helpers
+        function escHtml(str) { return str.replace(/'/g,"&#39;").replace(/"/g,"&quot;"); }
+        function resaltarTexto(texto, query) {
+            if (!query) return texto;
+            const re = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, "gi");
+            return texto.replace(re, "<strong>$1</strong>");
+        }
+
+        // Iniciar carga al abrir la página
+        document.addEventListener("DOMContentLoaded", cargarCatalogo);
+
+        let _rawCSV = "";
+        const _origFetch = fetchCSV;
+        fetchCSV = async function() {
+            const t = await _origFetch();
+            _rawCSV = t;
+            return t;
+        };
+
+        function mostrarDebug() {
+            const panel = document.getElementById("debugPanel");
+            if (!_rawCSV) { panel.style.display="block"; panel.textContent="CSV aún no cargado o vacío."; return; }
+            const lineas = _rawCSV.replace(/\r\n/g,"\n").replace(/\r/g,"\n").split("\n");
+            let info = "=== RAW (primeros 400 chars) ===\n";
+            info += JSON.stringify(_rawCSV.substring(0,400)) + "\n\n";
+            info += "=== LÍNEAS (" + lineas.length + " total) ===\n";
+            lineas.slice(0,10).forEach((l,i) => { info += "L"+i+": " + JSON.stringify(l) + "\n"; });
+            info += "\n=== PRODUCTOS PARSEADOS: " + catalogoProductos.length + " ===\n";
+            catalogoProductos.forEach(p => { info += JSON.stringify(p) + "\n"; });
+            panel.textContent = info;
+            panel.style.display = panel.style.display === "none" ? "block" : "none";
+        }
+    </script>
+
+    <script>
+        let datosSistemas = {
+            factura: { items: [], correlativo: 1, tipoDoc: "COMPROBANTE DE VENTA" },
+            cotizacion: { items: [], correlativo: 1, tipoDoc: "COTIZACIÓN DE PRECIOS" }
+        };
+
+        let moduloActivo = 'factura';
+
+        function cambiarPestana(modulo) {
+            moduloActivo = modulo;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            if(document.getElementById(`btn-tab-${modulo}`)) document.getElementById(`btn-tab-${modulo}`).classList.add('active');
+
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(`modulo-${modulo}`).classList.add('active');
+
+            const mainLayout = document.getElementById('main-layout');
+            const rightTicket = document.getElementById('right-column-ticket');
+
+            if (modulo === 'conversiones') {
+                mainLayout.className = "full-layout";
+                rightTicket.style.display = "none";
+            } else {
+                mainLayout.className = "grid-layout";
+                rightTicket.style.display = "block";
+            }
+        }
+
+        function agregarItem(e, modulo) {
+            e.preventDefault();
+            const nombre = document.getElementById(`nombre${modulo.charAt(0).toUpperCase() + modulo.slice(1)}`).value.trim();
+            const precioRaw = document.getElementById(`precio${modulo.charAt(0).toUpperCase() + modulo.slice(1)}`).value;
+            const cantidadRaw = document.getElementById(`cant${modulo.charAt(0).toUpperCase() + modulo.slice(1)}`).value;
+
+            const precio = parseFloat(precioRaw);
+            const cantidad = parseInt(cantidadRaw);
+
+            if (!nombre) return;
+            if (isNaN(precio) || precio <= 0) { alert("❌ El precio debe ser un número positivo."); return; }
+            if (isNaN(cantidad) || cantidad <= 0 || cantidadRaw.includes('.') || cantidadRaw.includes(',')) { alert("❌ Cantidad inválida."); return; }
+
+            const listaItems = datosSistemas[modulo].items;
+            const itemExistente = listaItems.find(item => item.nombre.toLowerCase() === nombre.toLowerCase() && item.precio === precio);
+            
+            if (itemExistente) { itemExistente.cantidad += cantidad; } else { listaItems.push({ nombre, precio, cantidad }); }
+
+            document.getElementById(`form${modulo.charAt(0).toUpperCase() + modulo.slice(1)}`).reset();
+            document.getElementById(`cant${modulo.charAt(0).toUpperCase() + modulo.slice(1)}`).value = "1";
+            document.getElementById(`nombre${modulo.charAt(0).toUpperCase() + modulo.slice(1)}`).focus();
+            actualizarTabla(modulo);
+        }
+
+        function actualizarTabla(modulo) {
+            const tbody = document.getElementById(`tabla${modulo.charAt(0).toUpperCase() + modulo.slice(1)}`);
+            const totalSpan = document.getElementById(`total${modulo.charAt(0).toUpperCase() + modulo.slice(1)}`);
+            const listaItems = datosSistemas[modulo].items;
+            
+            if (listaItems.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #999; padding: 20px;">Ningún producto agregado todavía</td></tr>`;
+                totalSpan.textContent = "0.00";
+                return;
+            }
+
+            tbody.innerHTML = '';
+            let total = 0;
+            listaItems.forEach((item, index) => {
+                const subtotal = item.precio * item.cantidad;
+                total += subtotal;
+                tbody.innerHTML += `<tr><td><strong>${item.cantidad}</strong></td><td>${item.nombre}</td><td>$${item.precio.toFixed(2)}</td><td><strong>$${subtotal.toFixed(2)}</strong></td><td><button class="edit" onclick="editarItem('${modulo}', ${index})">✏️</button><button class="danger" onclick="eliminarItem('${modulo}', ${index})">❌</button></td></tr>`;
+            });
+            totalSpan.textContent = total.toFixed(2);
+        }
+
+        function eliminarItem(modulo, index) { datosSistemas[modulo].items.splice(index, 1); actualizarTabla(modulo); }
+
+        function editarItem(modulo, index) {
+            const item = datosSistemas[modulo].items[index];
+            let nuevaCantidadRaw = prompt(`Cantidad:`, item.cantidad); if (nuevaCantidadRaw === null) return; 
+            let nuevaCantidad = parseInt(nuevaCantidadRaw);
+            let nuevoPrecioRaw = prompt(`Precio:`, item.precio); if (nuevoPrecioRaw === null) return; 
+            let nuevoPrecio = parseFloat(nuevoPrecioRaw);
+
+            if(!isNaN(nuevaCantidad) && nuevaCantidad > 0 && !isNaN(nuevoPrecio) && nuevoPrecio > 0) {
+                item.cantidad = nuevaCantidad; item.precio = nuevoPrecio; actualizarTabla(modulo);
+            } else { alert("❌ Valores inválidos."); }
+        }
+
+        function generarTicket(modulo) {
+            const inputId = modulo === 'factura' ? 'clienteFactura' : 'clienteCotizacion';
+            const clienteInput = document.getElementById(inputId);
+            let cliente = clienteInput.value.trim();
+            
+            if (!cliente) { alert("❌ El nombre del cliente es obligatorio."); clienteInput.focus(); return; }
+            const listaItems = datosSistemas[modulo].items;
+            if (listaItems.length === 0) { alert("❌ Agrega al menos un producto."); return; }
+
+            const contenedorTicket = document.getElementById('ticketImprimible');
+            const hoy = new Date();
+            const fechaActualStr = hoy.toLocaleDateString() + ' ' + hoy.toLocaleTimeString();
+            const quinceDiasDespues = new Date(); quinceDiasDespues.setDate(hoy.getDate() + 15);
+            
+            let htmlItems = ''; let total = 0;
+            listaItems.forEach(item => {
+                const subtotal = item.precio * item.cantidad; total += subtotal;
+                htmlItems += `<div class="ticket-product-block"><div class="ticket-item-main"><span>${item.cantidad} x ${item.nombre}</span></div><div class="ticket-item-sub"><span>P.U: $${item.precio.toFixed(2)} | Subt: $${subtotal.toFixed(2)}</span></div></div>`;
+            });
+
+            let numDocStr = String(datosSistemas[modulo].correlativo).padStart(6, '0');
+            let headerDocumento = modulo === 'factura' ? `<h3>${datosSistemas[modulo].tipoDoc}</h3><p>Documento N°: ${numDocStr}</p><p>Fecha: ${fechaActualStr}</p>` : `<h3>${datosSistemas[modulo].tipoDoc}</h3><p>Fecha de Emisión: ${fechaActualStr}</p>`;
+            let infoVigencia = modulo === 'cotizacion' ? `<div style="text-align:center; font-size:11px; margin-top:5px; background:#eee; padding:4px;"><strong>Válido hasta:</strong> ${quinceDiasDespues.toLocaleDateString()}</div><hr>` : '';
+
+            contenedorTicket.innerHTML = `
+                <div style="text-align:center"><h2 class="ticket-title">FERRETERÍA BUJAIDA</h2><div class="ticket-contact-info">Tel: +503 72969007<br>Email: agroferreteriabujaida@gmail.com</div>${headerDocumento}</div><hr>
+                <div style="font-size:12px;"><strong>Cliente:</strong> ${cliente.toUpperCase()}</div><hr>
+                ${htmlItems}<hr>
+                <div class="ticket-total"><span>TOTAL:</span><span>$${total.toFixed(2)}</span></div><hr>
+                ${infoVigencia}
+                <div style="text-align:center; margin-top:15px;">¡Gracias por su preferencia!<br>--- Módulo: ${modulo.toUpperCase()} ---</div>
+            `;
+            
+            contenedorTicket.setAttribute('data-origen', modulo);
+            contenedorTicket.setAttribute('data-cliente', cliente);
+            contenedorTicket.setAttribute('data-fecha', fechaActualStr);
+            contenedorTicket.setAttribute('data-correlativo', numDocStr);
+            contenedorTicket.setAttribute('data-vigencia', quinceDiasDespues.toLocaleDateString());
+            
+            // Mostrar panel de envío por correo electrónico
+            document.getElementById('panelEnvioCorreo').style.display = "block";
+        }
+
+        // NUEVA FUNCIÓN MEJORADA: ENVÍA EL CORREO CON FORMATO DE TICKET EXACTO
+        function enviarTicketFormateadoPorCorreo() {
+            const email = document.getElementById('emailCliente').value.trim();
+            const contenedor = document.getElementById('ticketImprimible');
+            const origen = contenedor.getAttribute('data-origen');
+            const cliente = (contenedor.getAttribute('data-cliente') || "Cliente").toUpperCase();
+            const fecha = contenedor.getAttribute('data-fecha');
+            const correlativo = contenedor.getAttribute('data-correlativo');
+            const vigencia = contenedor.getAttribute('data-vigencia');
+
+            const asunto = encodeURIComponent(`Ferretería Bujaida - ${origen === 'factura' ? 'Comprobante de Venta' : 'Cotización de Precios'}`);
+            const listaItems = datosSistemas[origen].items;
+
+            // CONSTRUCCIÓN MANUAL TEXTUAL - IDÉNTICA AL FORMATO FÍSICO
+            let c = "========================================\n";
+            c += "          FERRETERÍA BUJAIDA            \n";
+            c += "  Tel: +503 72969007                    \n";
+            c += "  Email: agroferreteriabujaida@gmail.com\n";
+            c += "========================================\n";
+            
+            if (origen === 'factura') {
+                c += ` COMPROBANTE DE VENTA                   \n`;
+                c += ` Documento N°: ${correlativo}           \n`;
+                c += ` Fecha: ${fecha}                        \n`;
+            } else {
+                c += ` COTIZACIÓN DE PRECIOS                  \n`;
+                c += ` Fecha de Emisión: ${fecha}             \n`;
+            }
+            c += "----------------------------------------\n";
+            c += ` Cliente: ${cliente}\n`;
+            c += "----------------------------------------\n";
+            c += " ARTÍCULOS:\n\n";
+
+            let total = 0;
+            listaItems.forEach(item => {
+                const subtotal = item.precio * item.cantidad;
+                total += subtotal;
+                c += ` * ${item.cantidad} x ${item.nombre}\n`;
+                c += `   P.U: $${item.precio.toFixed(2)} | Subt: $${subtotal.toFixed(2)}\n\n`;
+            });
+
+            c += "----------------------------------------\n";
+            c += ` TOTAL A PAGAR: $${total.toFixed(2)}\n`;
+            c += "----------------------------------------\n";
+            
+            if (origen === 'cotizacion') {
+                c += ` Válido hasta: ${vigencia}\n`;
+                c += "----------------------------------------\n";
+            }
+            
+            c += " ¡Gracias por su preferencia!\n";
+            c += "========================================";
+
+            // El truco es usar encodeURIComponent para conservar perfectamente cada salto de línea (\n) y espacio en Outlook o móviles
+            window.location.href = `mailto:${email}?subject=${asunto}&body=${encodeURIComponent(c)}`;
+        }
+
+        function imprimirTicket() {
+            const contenedorTicket = document.getElementById('ticketImprimible');
+            if (contenedorTicket.innerText.includes("Presiona")) return;
+            const origen = contenedorTicket.getAttribute('data-origen');
+            window.print();
+            if (origen === 'factura') datosSistemas[origen].correlativo++;
+            limpiarModulo(origen);
+        }
+
+        function limpiarModulo(modulo) {
+            datosSistemas[modulo].items = [];
+            const inputId = modulo === 'factura' ? 'clienteFactura' : 'clienteCotizacion';
+            if(document.getElementById(inputId)) document.getElementById(inputId).value = ""; 
+            actualizarTabla(modulo);
+            document.getElementById('ticketImprimible').innerHTML = `<div style="text-align: center; color: #7f8c8d; padding: 40px 0;">Presiona "Generar Ticket" en el módulo activo para visualizar el comprobante.</div>`;
+            document.getElementById('panelEnvioCorreo').style.display = "none";
+            document.getElementById('emailCliente').value = "";
+        }
+
+        // LÓGICA DE CONVERSIONES
+        function formatearSalida(v) { return (isNaN(v) || v === 0) ? "" : parseFloat(v.toFixed(4)); }
+        const factoresLongitud = { m: 1, yd: 1.0936, vrs: 1.1963, ft: 3.2808, cm: 100, in: 39.37, mm: 1000 };
+        function convertirLongitud(uOrig, valR) {
+            if (valR === "") { limpiarCamposClase('longitud'); return; }
+            const v = parseFloat(valR); if (isNaN(v)) return;
+            const mt = v / factoresLongitud[uOrig];
+            Object.keys(factoresLongitud).forEach(u => { if (u !== uOrig) document.getElementById(`conv_${u}`).value = formatearSalida(mt * factoresLongitud[u]); });
+        }
+        const factoresMasa = { kg: 1, lb: 2.2046, ar: 0.0881, qq: 0.0220, t: 0.001 };
+        function convertirMasa(uOrig, valR) {
+            if (valR === "") { limpiarCamposClase('masa'); return; }
+            const v = parseFloat(valR); if (isNaN(v)) return;
+            const kg = v / factoresMasa[uOrig];
+            Object.keys(factoresMasa).forEach(u => { if (u !== uOrig) document.getElementById(`conv_${u}`).value = formatearSalida(kg * factoresMasa[u]); });
+        }
+        const factoresVolumen = { l: 1, gal: 0.2641, bbl: 0.0062 };
+        function convertirVolumen(uOrig, valR) {
+            if (valR === "") { limpiarCamposClase('volumen'); return; }
+            const v = parseFloat(valR); if (isNaN(v)) return;
+            const lt = v / factoresVolumen[uOrig];
+            Object.keys(factoresVolumen).forEach(u => { if (u !== uOrig) document.getElementById(`conv_${u}`).value = formatearSalida(lt * factoresVolumen[u]); });
+        }
+        function limpiarCamposClase(c) {
+            let ids = c === 'longitud' ? ['conv_m','conv_yd','conv_vrs','conv_ft','conv_cm','conv_in','conv_mm'] : (c === 'masa' ? ['conv_kg','conv_lb','conv_ar','conv_qq','conv_t'] : ['conv_l','conv_gal','conv_bbl']);
+            ids.forEach(id => document.getElementById(id).value = "");
+        }
+    </script>
+</body>
+</html>
