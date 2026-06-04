@@ -1076,11 +1076,12 @@
             });
 
             let numDocStr = String(datosSistemas[modulo].correlativo).padStart(6, '0');
-            let headerDocumento = modulo === 'factura' ? `<h3>${datosSistemas[modulo].tipoDoc}</h3><p>Documento N°: ${numDocStr}</p><p>Fecha: ${fechaActualStr}</p>` : `<h3>${datosSistemas[modulo].tipoDoc}</h3><p>Fecha de Emisión: ${fechaActualStr}</p>`;
+            let tituloDoc = modulo === 'factura' ? 'COMPROBANTE DE COMPRA' : datosSistemas[modulo].tipoDoc;
+            let headerDocumento = modulo === 'factura' ? `<h3>${tituloDoc}</h3><p>Fecha: ${fechaActualStr}</p>` : `<h3>${tituloDoc}</h3><p>Fecha de Emisión: ${fechaActualStr}</p>`;
             let infoVigencia = modulo === 'cotizacion' ? `<div style="text-align:center; font-size:11px; margin-top:5px; background:#eee; padding:4px;"><strong>Válido hasta:</strong> ${quinceDiasDespues.toLocaleDateString()}</div><hr>` : '';
 
             contenedorTicket.innerHTML = `
-                <div style="text-align:center"><h2 class="ticket-title">FERRETERÍA BUJAIDA</h2><div class="ticket-contact-info">Tel: +503 72969007<br>Email: agroferreteriabujaida@gmail.com</div>${headerDocumento}</div><hr>
+                <div style="text-align:center"><h2 class="ticket-title">FERRETERÍA BUJAIDA</h2><div class="ticket-contact-info">Suc. Desvío a San Pedro Nonualco<br>Tel: +503 72969007<br>Email: agroferreteriabujaida@gmail.com</div>${headerDocumento}</div><hr>
                 <div style="font-size:12px;"><strong>Cliente:</strong> ${cliente.toUpperCase()}</div><hr>
                 ${htmlItems}<hr>
                 <div class="ticket-total"><span>TOTAL:</span><span>$${total.toFixed(2)}</span></div><hr>
@@ -1114,13 +1115,13 @@
             // CONSTRUCCIÓN MANUAL TEXTUAL - IDÉNTICA AL FORMATO FÍSICO
             let c = "========================================\n";
             c += "          FERRETERÍA BUJAIDA            \n";
+            c += "  Suc. Desvío a San Pedro Nonualco      \n";
             c += "  Tel: +503 72969007                    \n";
             c += "  Email: agroferreteriabujaida@gmail.com\n";
             c += "========================================\n";
             
             if (origen === 'factura') {
-                c += ` COMPROBANTE DE VENTA                   \n`;
-                c += ` Documento N°: ${correlativo}           \n`;
+                c += ` COMPROBANTE DE COMPRA                  \n`;
                 c += ` Fecha: ${fecha}                        \n`;
             } else {
                 c += ` COTIZACIÓN DE PRECIOS                  \n`;
