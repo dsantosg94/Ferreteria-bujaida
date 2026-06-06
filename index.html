@@ -1136,6 +1136,11 @@
             const origen = contenedorTicket.getAttribute('data-origen');
             const html = contenedorTicket.innerHTML;
 
+            const esCotizacion = origen === 'cotizacion';
+            const cuerpo = esCotizacion
+                ? `<div class="ticket">${html}</div>`
+                : `<div class="ticket"><div class="label-copia">COPIA DEL CLIENTE</div>${html}</div><div class="ticket">${html}</div>`;
+
             const ventana = window.open('', '_blank', 'width=600,height=800');
             ventana.document.write(`<!DOCTYPE html>
 <html><head><meta charset="UTF-8">
@@ -1156,13 +1161,7 @@
   p { text-align: center; font-size: 11px; }
 </style>
 </head><body>
-  <div class="ticket">
-    <div class="label-copia">COPIA DEL CLIENTE</div>
-    ${html}
-  </div>
-  <div class="ticket">
-    ${html}
-  </div>
+  ${cuerpo}
 </body></html>`);
             ventana.document.close();
             ventana.focus();
