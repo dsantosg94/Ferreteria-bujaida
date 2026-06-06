@@ -413,22 +413,37 @@
 
         /* CONFIGURACIÓN DE IMPRESIÓN */
         @media print {
-            body * {
-                visibility: hidden;
-            }
-            #ticketImprimible, #ticketImprimible * {
-                visibility: visible;
-            }
-            #ticketImprimible {
-                position: absolute;
-                top: 0;
-                left: 0;
+            body { margin: 0; }
+            body * { visibility: hidden; }
+            #areaImpresion { visibility: visible; }
+            #areaImpresion * { visibility: visible; }
+            #ticketImprimible { display: none !important; visibility: hidden !important; }
+            #areaImpresion {
+                position: static;
                 width: 100%;
-                border: none;
-                box-shadow: none;
-                padding: 0;
-                margin: 0;
+                display: block !important;
+                border: none; box-shadow: none; padding: 0; margin: 0;
             }
+            .ticket-copia {
+                width: 260px;
+                margin: 0;
+                padding: 10px;
+                font-family: 'Courier New', monospace;
+                font-size: 11px;
+                color: #000;
+                box-sizing: border-box;
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+            .salto-pagina {
+                display: block;
+                page-break-after: always;
+                break-after: page;
+                height: 0;
+                margin: 0;
+                padding: 0;
+            }
+            .ticket-separador { display: none; }
         }
     </style>
 </head>
@@ -680,15 +695,9 @@
                     </div>
 
                     <button class="print" onclick="imprimirTicket()">🖨️ Imprimir Ticket</button>
+                    <div id="areaImpresion" style="display:none;"></div>
 
-                    <!-- PANEL EXCLUSIVO PARA ENVÍO POR CORREO ELECTRÓNICO DIRECTO -->
-                    <div id="panelEnvioCorreo" style="display: none; margin-top: 15px; padding-top: 15px; border-top: 2px dashed #bdc3c7;">
-                        <div class="form-group">
-                            <label style="color: #27ae60;">✉️ Correo Destinatario (Cliente):</label>
-                            <input type="email" id="emailCliente" placeholder="cliente@correo.com">
-                        </div>
-                        <button class="email-btn" onclick="enviarTicketFormateadoPorCorreo()">🚀 Enviar Ticket por Correo</button>
-                    </div>
+
                 </div>
             </div>
         </div>
@@ -736,15 +745,9 @@
                 if (r.ok) { const t = await r.text(); if (t.includes(",")) return t; }
             } catch(e) {}
 
-            // Intento 2: corsproxy.io
+            // Intento 2: allorigins /get (JSON con contents)
             try {
-                const r = await fetchConTimeout("https://corsproxy.io/?" + enc, {}, 7000);
-                if (r.ok) { const t = await r.text(); if (t.includes(",")) return t; }
-            } catch(e) {}
-
-            // Intento 3: allorigins — puede devolver base64
-            try {
-                const r = await fetchConTimeout("https://api.allorigins.win/get?url=" + enc, {}, 7000);
+                const r = await fetchConTimeout("https://api.allorigins.win/get?url=" + enc, {}, 8000);
                 if (r.ok) {
                     const j = await r.json();
                     const texto = decodificarContenido(j.contents || "");
@@ -752,21 +755,33 @@
                 }
             } catch(e) {}
 
-            // Intento 4: thingproxy
+            // Intento 3: allorigins /raw (texto directo)
             try {
-                const r = await fetchConTimeout("https://thingproxy.freeboard.io/fetch/" + SHEET_CSV_URL, {}, 7000);
+                const r = await fetchConTimeout("https://api.allorigins.win/raw?url=" + enc, {}, 8000);
                 if (r.ok) { const t = await r.text(); if (t.includes(",")) return t; }
             } catch(e) {}
 
-            // Intento 5: proxy de htmldriven
+            // Intento 4: corsproxy.io
             try {
-                const r = await fetchConTimeout("https://cors.eu.org/" + SHEET_CSV_URL, {}, 7000);
+                const r = await fetchConTimeout("https://corsproxy.io/?" + enc, {}, 8000);
                 if (r.ok) { const t = await r.text(); if (t.includes(",")) return t; }
             } catch(e) {}
 
-            // Intento 6: crossorigin.me
+            // Intento 5: codetabs (muy estable)
             try {
-                const r = await fetchConTimeout("https://crossorigin.me/" + SHEET_CSV_URL, {}, 7000);
+                const r = await fetchConTimeout("https://api.codetabs.com/v1/proxy?quest=" + enc, {}, 8000);
+                if (r.ok) { const t = await r.text(); if (t.includes(",")) return t; }
+            } catch(e) {}
+
+            // Intento 6: cors.sh
+            try {
+                const r = await fetchConTimeout("https://cors.sh/" + SHEET_CSV_URL, {}, 8000);
+                if (r.ok) { const t = await r.text(); if (t.includes(",")) return t; }
+            } catch(e) {}
+
+            // Intento 7: htmldriven
+            try {
+                const r = await fetchConTimeout("https://cors-anywhere.htmldriven.com/?url=" + enc, {}, 8000);
                 if (r.ok) { const t = await r.text(); if (t.includes(",")) return t; }
             } catch(e) {}
 
@@ -889,7 +904,14 @@
             if (e) e.preventDefault();
             const cap = modulo.charAt(0).toUpperCase() + modulo.slice(1);
             document.getElementById(`nombre${cap}`).value = descripcion || nombre;
-            document.getElementById(`precio${cap}`).value = precio > 0 ? precio.toFixed(2) : "";
+            const precioEl = document.getElementById(`precio${cap}`);
+            precioEl.value = precio > 0 ? precio.toFixed(2) : "";
+            // Bloquear precio si vino del catálogo
+            if (precio > 0) {
+                precioEl.readOnly = true;
+                precioEl.style.background = '#ecf0f1';
+                precioEl.title = 'Precio fijo del catálogo';
+            }
             document.getElementById(`lista${cap}`).style.display = "none";
             document.getElementById(`status${cap}`).textContent = `✔ ${nombre}${precio > 0 ? " · $" + precio.toFixed(2) : ""}`;
             document.getElementById(`cant${cap}`).focus();
@@ -996,11 +1018,20 @@
             }
         }
 
+        function desbloquearPrecio(modulo) {
+            const cap = modulo.charAt(0).toUpperCase() + modulo.slice(1);
+            const el = document.getElementById(`precio${cap}`);
+            if (el) { el.readOnly = false; el.style.background = ''; el.title = ''; }
+            const st = document.getElementById(`status${cap}`);
+            if (st) st.textContent = '';
+        }
+
         function agregarItem(e, modulo) {
             e.preventDefault();
-            const nombre = document.getElementById(`nombre${modulo.charAt(0).toUpperCase() + modulo.slice(1)}`).value.trim();
-            const precioRaw = document.getElementById(`precio${modulo.charAt(0).toUpperCase() + modulo.slice(1)}`).value;
-            const cantidadRaw = document.getElementById(`cant${modulo.charAt(0).toUpperCase() + modulo.slice(1)}`).value;
+            const cap = modulo.charAt(0).toUpperCase() + modulo.slice(1);
+            const nombre = document.getElementById(`nombre${cap}`).value.trim();
+            const precioRaw = document.getElementById(`precio${cap}`).value;
+            const cantidadRaw = document.getElementById(`cant${cap}`).value;
 
             const precio = parseFloat(precioRaw);
             const cantidad = parseInt(cantidadRaw);
@@ -1014,9 +1045,10 @@
             
             if (itemExistente) { itemExistente.cantidad += cantidad; } else { listaItems.push({ nombre, precio, cantidad }); }
 
-            document.getElementById(`form${modulo.charAt(0).toUpperCase() + modulo.slice(1)}`).reset();
-            document.getElementById(`cant${modulo.charAt(0).toUpperCase() + modulo.slice(1)}`).value = "1";
-            document.getElementById(`nombre${modulo.charAt(0).toUpperCase() + modulo.slice(1)}`).focus();
+            document.getElementById(`form${cap}`).reset();
+            document.getElementById(`cant${cap}`).value = "1";
+            desbloquearPrecio(modulo);
+            document.getElementById(`nombre${cap}`).focus();
             actualizarTabla(modulo);
         }
 
@@ -1045,14 +1077,13 @@
 
         function editarItem(modulo, index) {
             const item = datosSistemas[modulo].items[index];
-            let nuevaCantidadRaw = prompt(`Cantidad:`, item.cantidad); if (nuevaCantidadRaw === null) return; 
-            let nuevaCantidad = parseInt(nuevaCantidadRaw);
-            let nuevoPrecioRaw = prompt(`Precio:`, item.precio); if (nuevoPrecioRaw === null) return; 
-            let nuevoPrecio = parseFloat(nuevoPrecioRaw);
-
-            if(!isNaN(nuevaCantidad) && nuevaCantidad > 0 && !isNaN(nuevoPrecio) && nuevoPrecio > 0) {
-                item.cantidad = nuevaCantidad; item.precio = nuevoPrecio; actualizarTabla(modulo);
-            } else { alert("❌ Valores inválidos."); }
+            let raw = prompt(`Nueva cantidad para:\n"${item.nombre}"`, item.cantidad);
+            if (raw === null) return;
+            let nueva = parseInt(raw);
+            if (!isNaN(nueva) && nueva > 0) {
+                item.cantidad = nueva;
+                actualizarTabla(modulo);
+            } else { alert("❌ Cantidad inválida."); }
         }
 
         function generarTicket(modulo) {
@@ -1089,78 +1120,57 @@
                 <div style="text-align:center; margin-top:15px;">¡Gracias por su preferencia!<br>--- Módulo: ${modulo.toUpperCase()} ---</div>
             `;
             
+            // Ticket generado
             contenedorTicket.setAttribute('data-origen', modulo);
             contenedorTicket.setAttribute('data-cliente', cliente);
             contenedorTicket.setAttribute('data-fecha', fechaActualStr);
             contenedorTicket.setAttribute('data-correlativo', numDocStr);
             contenedorTicket.setAttribute('data-vigencia', quinceDiasDespues.toLocaleDateString());
             
-            // Mostrar panel de envío por correo electrónico
-            document.getElementById('panelEnvioCorreo').style.display = "block";
-        }
-
-        // NUEVA FUNCIÓN MEJORADA: ENVÍA EL CORREO CON FORMATO DE TICKET EXACTO
-        function enviarTicketFormateadoPorCorreo() {
-            const email = document.getElementById('emailCliente').value.trim();
-            const contenedor = document.getElementById('ticketImprimible');
-            const origen = contenedor.getAttribute('data-origen');
-            const cliente = (contenedor.getAttribute('data-cliente') || "Cliente").toUpperCase();
-            const fecha = contenedor.getAttribute('data-fecha');
-            const correlativo = contenedor.getAttribute('data-correlativo');
-            const vigencia = contenedor.getAttribute('data-vigencia');
-
-            const asunto = encodeURIComponent(`Ferretería Bujaida - ${origen === 'factura' ? 'Comprobante de Venta' : 'Cotización de Precios'}`);
-            const listaItems = datosSistemas[origen].items;
-
-            // CONSTRUCCIÓN MANUAL TEXTUAL - IDÉNTICA AL FORMATO FÍSICO
-            let c = "========================================\n";
-            c += "          FERRETERÍA BUJAIDA            \n";
-            c += "  Suc. Desvío a San Pedro Nonualco      \n";
-            c += "  Tel: +503 72969007                    \n";
-            c += "  Email: agroferreteriabujaida@gmail.com\n";
-            c += "========================================\n";
-            
-            if (origen === 'factura') {
-                c += ` COMPROBANTE DE COMPRA                  \n`;
-                c += ` Fecha: ${fecha}                        \n`;
-            } else {
-                c += ` COTIZACIÓN DE PRECIOS                  \n`;
-                c += ` Fecha de Emisión: ${fecha}             \n`;
-            }
-            c += "----------------------------------------\n";
-            c += ` Cliente: ${cliente}\n`;
-            c += "----------------------------------------\n";
-            c += " ARTÍCULOS:\n\n";
-
-            let total = 0;
-            listaItems.forEach(item => {
-                const subtotal = item.precio * item.cantidad;
-                total += subtotal;
-                c += ` * ${item.cantidad} x ${item.nombre}\n`;
-                c += `   P.U: $${item.precio.toFixed(2)} | Subt: $${subtotal.toFixed(2)}\n\n`;
-            });
-
-            c += "----------------------------------------\n";
-            c += ` TOTAL A PAGAR: $${total.toFixed(2)}\n`;
-            c += "----------------------------------------\n";
-            
-            if (origen === 'cotizacion') {
-                c += ` Válido hasta: ${vigencia}\n`;
-                c += "----------------------------------------\n";
-            }
-            
-            c += " ¡Gracias por su preferencia!\n";
-            c += "========================================";
-
-            // El truco es usar encodeURIComponent para conservar perfectamente cada salto de línea (\n) y espacio en Outlook o móviles
-            window.location.href = `mailto:${email}?subject=${asunto}&body=${encodeURIComponent(c)}`;
+            // Ticket listo para imprimir
         }
 
         function imprimirTicket() {
             const contenedorTicket = document.getElementById('ticketImprimible');
             if (contenedorTicket.innerText.includes("Presiona")) return;
             const origen = contenedorTicket.getAttribute('data-origen');
-            window.print();
+            const html = contenedorTicket.innerHTML;
+
+            const ventana = window.open('', '_blank', 'width=600,height=800');
+            ventana.document.write(`<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Courier New', monospace; font-size: 11px; color: #000; }
+  .ticket { width: 260px; padding: 10px; page-break-after: always; break-after: page; }
+  .ticket:last-child { page-break-after: avoid; break-after: avoid; }
+  .label-copia { text-align:center; font-weight:bold; border:1px solid #000; padding:2px 4px; margin-bottom:6px; font-size:10px; letter-spacing:1px; }
+  .ticket-title { font-size: 16px; font-weight: bold; }
+  .ticket-contact-info { font-size: 11px; margin-bottom: 4px; }
+  .ticket-total { display:flex; justify-content:space-between; font-weight:bold; }
+  .ticket-product-block { margin: 3px 0; }
+  .ticket-item-main { font-weight: bold; }
+  .ticket-item-sub { font-size: 10px; padding-left: 8px; }
+  hr { border: none; border-top: 1px dashed #000; margin: 5px 0; }
+  h2, h3 { text-align: center; }
+  p { text-align: center; font-size: 11px; }
+</style>
+</head><body>
+  <div class="ticket">
+    <div class="label-copia">COPIA DEL CLIENTE</div>
+    ${html}
+  </div>
+  <div class="ticket">
+    ${html}
+  </div>
+</body></html>`);
+            ventana.document.close();
+            ventana.focus();
+            setTimeout(() => {
+                ventana.print();
+                ventana.close();
+            }, 500);
+
             if (origen === 'factura') datosSistemas[origen].correlativo++;
             limpiarModulo(origen);
         }
@@ -1169,10 +1179,9 @@
             datosSistemas[modulo].items = [];
             const inputId = modulo === 'factura' ? 'clienteFactura' : 'clienteCotizacion';
             if(document.getElementById(inputId)) document.getElementById(inputId).value = ""; 
+            desbloquearPrecio(modulo);
             actualizarTabla(modulo);
             document.getElementById('ticketImprimible').innerHTML = `<div style="text-align: center; color: #7f8c8d; padding: 40px 0;">Presiona "Generar Ticket" en el módulo activo para visualizar el comprobante.</div>`;
-            document.getElementById('panelEnvioCorreo').style.display = "none";
-            document.getElementById('emailCliente').value = "";
         }
 
         // LÓGICA DE CONVERSIONES
